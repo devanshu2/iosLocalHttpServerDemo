@@ -21,6 +21,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var myWebView: UIWebView!
     @IBOutlet weak var progressLabel:UILabel!
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = "Web Page"
