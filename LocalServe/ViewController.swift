@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     fileprivate lazy var webServer = GCDWebServer()
     fileprivate var lastZipProgress:UInt64 = 0
     
-    static var serverPort:UInt = 8080
+    static var serverPort:UInt = 8888
     static let Documents = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0] as String
     static let kSavedData = "kSavedData"
     
@@ -34,6 +34,7 @@ class ViewController: UIViewController {
         else {
             self.saveContentToDocumentDirectory()
         }
+        self.myWebView.allowsInlineMediaPlayback = true
     }
     
     private func saveContentToDocumentDirectory() {
@@ -52,7 +53,8 @@ class ViewController: UIViewController {
         let filesPath = ViewController.Documents + "/28_lee_ave_smiths_falls/"
         self.webServer.addGETHandler(forBasePath: "/", directoryPath: filesPath, indexFilename: nil, cacheAge: 3600, allowRangeRequests: true)
         self.webServer.delegate = self
-        self.webServer.start(withPort: ViewController.serverPort, bonjourName: nil)
+        self.webServer.start()
+//        self.webServer.start(withPort: ViewController.serverPort, bonjourName: nil)
     }
 }
 
@@ -79,11 +81,29 @@ extension ViewController: SSZipArchiveDelegate {
 
 extension ViewController: GCDWebServerDelegate {
     func webServerDidStart(_ server: GCDWebServer) {
-        let path = (server.serverURL?.absoluteString)! + "index.html"
+        var path = ""
+        if server.serverURL == nil {
+            path = "http://127.0.0.1:" + String(server.port) + "/index.html"
+        }
+        else {
+            path = (server.serverURL?.absoluteString)! + "index.html"
+        }
         let requestURL = URL(string: path)
         let request = URLRequest(url: requestURL!)
         self.view.bringSubview(toFront: self.myWebView)
         self.myWebView.loadRequest(request)
+    }
+    
+    func webServerDidDisconnect(_ server: GCDWebServer) {
+        
+    }
+    
+    func webServerDidStop(_ server: GCDWebServer) {
+        
+    }
+    
+    func webServerDidCompleteBonjourRegistration(_ server: GCDWebServer) {
+        
     }
 }
 
